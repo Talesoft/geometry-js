@@ -2,7 +2,6 @@
   "name": "@talesoft/geometry",
   "version": "0.1.0",
   "description": "A small geometry utility library",
-  "main": "dist/index.js",
   "scripts": {
     "test": "test"
   },
