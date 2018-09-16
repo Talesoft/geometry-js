@@ -1,0 +1,19 @@
+{
+  "name": "@talesoft/geometry",
+  "version": "0.1.0",
+  "description": "A small geometry utility library",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Talesoft/geometry-js.git"
+  },
+  "author": "Torben Köhn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Talesoft/geometry-js/issues"
+  },
+  "homepage": "https://github.com/Talesoft/geometry-js#readme"
+}
