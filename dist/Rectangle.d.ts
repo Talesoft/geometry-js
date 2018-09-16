@@ -1,0 +1,52 @@
+import Vector2, { Vector2Literal } from "./Vector2.js";
+import Circle from "./Circle.js";
+import Edge from "./Edge.js";
+import Polygon from "./Polygon.js";
+export interface RectangleLiteral {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+export declare type RectangleTuple = [number, number, number, number];
+export declare type RectangleVertexTuple = [Vector2, Vector2, Vector2, Vector2];
+export declare type RectangleEdgeTuple = [Edge, Edge, Edge, Edge];
+export default class Rectangle implements RectangleLiteral {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    constructor(x?: number, y?: number, width?: number, height?: number);
+    readonly area: number;
+    position: Vector2;
+    size: Vector2;
+    center: Vector2;
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+    leftTop: Vector2;
+    rightTop: Vector2;
+    leftBottom: Vector2;
+    rightBottom: Vector2;
+    readonly leftEdge: Edge;
+    readonly rightEdge: Edge;
+    readonly topEdge: Edge;
+    readonly bottomEdge: Edge;
+    readonly vertices: RectangleVertexTuple;
+    readonly edges: RectangleEdgeTuple;
+    set(rect: Partial<RectangleLiteral>): Rectangle;
+    add(rect: Partial<RectangleLiteral>): Rectangle;
+    subtract(rect: Partial<RectangleLiteral>): Rectangle;
+    multiply(rect: Partial<RectangleLiteral>): Rectangle;
+    divide(rect: Partial<RectangleLiteral>): Rectangle;
+    expand(vec2: Vector2Literal): Rectangle;
+    copy(): Rectangle;
+    contains(vec2: Vector2Literal): boolean;
+    overlapsRectangle(rect: Rectangle): boolean;
+    overlapsCircle(circle: Circle): boolean;
+    toTuple(): RectangleTuple;
+    toPolygon(): Polygon;
+    toString(): string;
+    static fromTuple(tuple: RectangleTuple): Rectangle;
+}
