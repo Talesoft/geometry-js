@@ -1,7 +1,12 @@
-import Vector2 from "./Vector2.js";
-import { clamp } from "./Math.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = require("./common");
+const Vector2_1 = __importDefault(require("./Vector2"));
 const { PI, sqrt } = Math;
-export default class Circle {
+class Circle {
     constructor(x, y, radius) {
         this.x = 0;
         this.y = 0;
@@ -20,7 +25,7 @@ export default class Circle {
         return this.radius * this.radius * PI;
     }
     get position() {
-        return new Vector2(this.x, this.y);
+        return new Vector2_1.default(this.x, this.y);
     }
     set position(vec2) {
         this.x = vec2.x;
@@ -92,33 +97,39 @@ export default class Circle {
     contains(vec2) {
         return sqrt((vec2.x - this.x) * (vec2.x - this.x) + (vec2.y - this.y) * (vec2.y - this.y)) < this.radius;
     }
+    // @ts-ignore
     overlapsEdge(edge) {
         throw new Error('Not implemented');
     }
+    // @ts-ignore
     intersectEdge(edge) {
         throw new Error('Not implemented');
     }
     overlapsRectangle(rect) {
-        let v = new Vector2(clamp(rect.left, this.x, rect.right), clamp(rect.top, this.y, rect.bottom));
-        let direction = this.position.subtract(v);
-        let mag = direction.magnitude;
+        const v = new Vector2_1.default(common_1.clamp(rect.left, this.x, rect.right), common_1.clamp(rect.top, this.y, rect.bottom));
+        const direction = this.position.subtract(v);
+        const mag = direction.magnitude;
         return ((mag > 0) && (mag < this.radius * this.radius));
     }
+    // @ts-ignore
     intersectRectangle(rect) {
         throw new Error('Not implemented');
     }
     overlapsCircle(circle) {
-        let distanceX = this.x - circle.x;
-        let distanceY = this.y - circle.y;
-        let radiusSum = this.radius + circle.radius;
+        const distanceX = this.x - circle.x;
+        const distanceY = this.y - circle.y;
+        const radiusSum = this.radius + circle.radius;
         return distanceX * distanceX + distanceY * distanceY <= radiusSum * radiusSum;
     }
+    // @ts-ignore
     intersectCircle(circle) {
         throw new Error('Not implemented');
     }
+    // @ts-ignore
     overlapsPolygon(poly) {
         throw new Error('Not implemented');
     }
+    // @ts-ignore
     intersectPolygon(poly) {
         throw new Error('Not implemented');
     }
@@ -132,4 +143,4 @@ export default class Circle {
         return new Circle(...tuple);
     }
 }
-//# sourceMappingURL=Circle.js.map
+exports.default = Circle;

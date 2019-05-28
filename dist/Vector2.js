@@ -1,6 +1,8 @@
-import { clamp, clamp01, epsilon } from "./Math.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = require("./common");
 const { sqrt, acos, min, max } = Math;
-export default class Vector2 {
+class Vector2 {
     constructor(x, y) {
         this.x = 0;
         this.y = 0;
@@ -86,29 +88,28 @@ export default class Vector2 {
         return this;
     }
     clamp(minValue, maxValue) {
-        this.x = clamp(minValue, this.x, maxValue);
-        this.y = clamp(minValue, this.y, maxValue);
+        this.x = common_1.clamp(minValue, this.x, maxValue);
+        this.y = common_1.clamp(minValue, this.y, maxValue);
         return this;
     }
     clamp01() {
         return this.clamp(0, 1);
     }
     normalize() {
-        let mag = this.magnitude;
+        const mag = this.magnitude;
         if (mag !== 0) {
             this.x /= mag;
             this.y /= mag;
         }
         return this;
     }
-    ;
     lerp(vec2, t) {
-        return this.lerpUnclamped(vec2, clamp01(t));
+        return this.lerpUnclamped(vec2, common_1.clamp01(t));
     }
     lerpUnclamped(vec2, t) {
         return this.add({
             x: (vec2.x - this.x) * t,
-            y: (vec2.y - this.y) * t
+            y: (vec2.y - this.y) * t,
         });
     }
     perp() {
@@ -117,14 +118,13 @@ export default class Vector2 {
         this.y = -x;
         return this;
     }
-    ;
     moveTowards(vec2, maxDistanceDelta) {
-        let toVector = vec2.copy().subtract(this);
-        let dist = toVector.magnitude;
-        if (dist <= maxDistanceDelta || dist == 0) {
+        const toVector = vec2.copy().subtract(this);
+        const dist = toVector.magnitude;
+        if (dist <= maxDistanceDelta || dist === 0) {
             return this;
         }
-        let divisor = dist * maxDistanceDelta;
+        const divisor = dist * maxDistanceDelta;
         this.add(toVector);
         this.x /= divisor;
         this.y /= divisor;
@@ -133,18 +133,18 @@ export default class Vector2 {
     moveBy(amount, direction) {
         return this.add({
             x: direction.x * amount,
-            y: direction.y * amount
+            y: direction.y * amount,
         });
     }
     getDotProduct(vec2) {
         return this.x * vec2.x + this.y * vec2.y;
     }
     getAngleTo(vec2) {
-        let denominator = sqrt(this.length * vec2.length);
-        if (denominator < epsilon) {
+        const denominator = sqrt(this.length * vec2.length);
+        if (denominator < common_1.EPSILON) {
             return 0;
         }
-        let dot = clamp(-1, this.getDotProduct(vec2) / denominator, 1);
+        const dot = common_1.clamp(-1, this.getDotProduct(vec2) / denominator, 1);
         return acos(dot);
     }
     getDistanceTo(vec2) {
@@ -180,4 +180,4 @@ Vector2.left = new Vector2(-1, 0);
 Vector2.right = new Vector2(1, 0);
 Vector2.infinity = new Vector2(Infinity, Infinity);
 Vector2.negativeInfinity = new Vector2(-Infinity, -Infinity);
-//# sourceMappingURL=Vector2.js.map
+exports.default = Vector2;

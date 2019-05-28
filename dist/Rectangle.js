@@ -1,8 +1,13 @@
-import Vector2 from "./Vector2.js";
-import { clamp } from "./Math.js";
-import Edge from "./Edge.js";
-import Polygon from "./Polygon.js";
-export default class Rectangle {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = require("./common");
+const Edge_1 = __importDefault(require("./Edge"));
+const Polygon_1 = __importDefault(require("./Polygon"));
+const Vector2_1 = __importDefault(require("./Vector2"));
+class Rectangle {
     constructor(x, y, width, height) {
         this.x = 0;
         this.y = 0;
@@ -25,21 +30,21 @@ export default class Rectangle {
         return this.width * this.height;
     }
     get position() {
-        return new Vector2(this.x, this.y);
+        return new Vector2_1.default(this.x, this.y);
     }
     set position(vec2) {
         this.x = vec2.x;
         this.y = vec2.y;
     }
     get size() {
-        return new Vector2(this.width, this.height);
+        return new Vector2_1.default(this.width, this.height);
     }
     set size(vec2) {
         this.width = vec2.x;
         this.height = vec2.y;
     }
     get center() {
-        return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
+        return new Vector2_1.default(this.x + this.width / 2, this.y + this.height / 2);
     }
     set center(vec2) {
         this.x = vec2.x - this.width / 2;
@@ -72,44 +77,44 @@ export default class Rectangle {
         this.height -= this.bottom - value;
     }
     get leftTop() {
-        return new Vector2(this.left, this.top);
+        return new Vector2_1.default(this.left, this.top);
     }
     set leftTop(vec2) {
         this.left = vec2.x;
         this.top = vec2.y;
     }
     get rightTop() {
-        return new Vector2(this.right, this.top);
+        return new Vector2_1.default(this.right, this.top);
     }
     set rightTop(vec2) {
         this.right = vec2.x;
         this.top = vec2.y;
     }
     get leftBottom() {
-        return new Vector2(this.left, this.bottom);
+        return new Vector2_1.default(this.left, this.bottom);
     }
     set leftBottom(vec2) {
         this.left = vec2.x;
         this.bottom = vec2.y;
     }
     get rightBottom() {
-        return new Vector2(this.left, this.bottom);
+        return new Vector2_1.default(this.left, this.bottom);
     }
     set rightBottom(vec2) {
         this.right = vec2.x;
         this.bottom = vec2.y;
     }
     get leftEdge() {
-        return new Edge(this.leftBottom, this.leftTop);
+        return new Edge_1.default(this.leftBottom, this.leftTop);
     }
     get rightEdge() {
-        return new Edge(this.rightTop, this.rightBottom);
+        return new Edge_1.default(this.rightTop, this.rightBottom);
     }
     get topEdge() {
-        return new Edge(this.leftTop, this.rightTop);
+        return new Edge_1.default(this.leftTop, this.rightTop);
     }
     get bottomEdge() {
-        return new Edge(this.rightBottom, this.leftBottom);
+        return new Edge_1.default(this.rightBottom, this.leftBottom);
     }
     get vertices() {
         return [this.leftTop, this.rightTop, this.rightBottom, this.leftBottom];
@@ -213,26 +218,45 @@ export default class Rectangle {
     contains(vec2) {
         return (vec2.x >= this.x) && (vec2.x < this.right) && (vec2.y >= this.y) && (vec2.y < this.bottom);
     }
-    //TODO: overlapsEdge(edge: Edge): boolean
-    //TODO: intersectEdge(edge: Edge): Vector2
+    // @ts-ignore
+    overlapsEdge(edge) {
+        throw new Error('Not implemented');
+    }
+    // @ts-ignore
+    intersectEdge(edge) {
+        throw new Error('Not implemented');
+    }
     overlapsRectangle(rect) {
         return (rect.right > this.x && rect.x < this.right && rect.bottom > this.right && rect.y < this.bottom);
     }
-    //TODO: interesectRectangle(rect: Rectangle): Vector2[]
+    // @ts-ignore
+    intersectRectangle(rect) {
+        throw new Error('Not implemented');
+    }
+    // @ts-ignore
     overlapsCircle(circle) {
-        let v = new Vector2(clamp(this.left, circle.x, this.right), clamp(this.top, circle.y, this.bottom));
-        let direction = circle.position.subtract(v);
-        let mag = direction.magnitude;
+        const v = new Vector2_1.default(common_1.clamp(this.left, circle.x, this.right), common_1.clamp(this.top, circle.y, this.bottom));
+        const direction = circle.position.subtract(v);
+        const mag = direction.magnitude;
         return ((mag > 0) && (mag < circle.radius * circle.radius));
     }
-    //TODO: interesectCircle(circle: Circle): Vector2[]
-    //TODO: overlapsPolygon(poly: Polygon): boolean
-    //TODO: intersectPolygon(poly: Polygon): Vector2[]
+    // @ts-ignore
+    intersectCircle(circle) {
+        throw new Error('Not implemented');
+    }
+    // @ts-ignore
+    overlapsPolygon(poly) {
+        throw new Error('Not implemented');
+    }
+    // @ts-ignore
+    intersectPolygon(poly) {
+        throw new Error('Not implemented');
+    }
     toTuple() {
         return [this.x, this.y, this.width, this.height];
     }
     toPolygon() {
-        return new Polygon(this.vertices);
+        return new Polygon_1.default(this.vertices);
     }
     toString() {
         return `rect(${this.x.toFixed(2)}, ${this.y.toFixed(2)}, ${this.width.toFixed(2)}, ${this.height.toFixed(2)})`;
@@ -241,4 +265,4 @@ export default class Rectangle {
         return new Rectangle(...tuple);
     }
 }
-//# sourceMappingURL=Rectangle.js.map
+exports.default = Rectangle;

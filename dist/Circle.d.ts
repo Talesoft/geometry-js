@@ -1,15 +1,18 @@
-import Vector2, { Vector2Literal } from "./Vector2.js";
-import Rectangle from "./Rectangle.js";
-import { Geometry } from "./Geometry.js";
-import Edge from "./Edge.js";
-import Polygon from "./Polygon.js";
+import Edge, { EdgeCollidable } from './Edge';
+import Polygon, { PolygonCollidable } from './Polygon';
+import Rectangle, { RectangleCollidable } from './Rectangle';
+import Vector2, { Vector2Literal } from './Vector2';
 export interface CircleLiteral {
     x: number;
     y: number;
     radius: number;
 }
 export declare type CircleTuple = [number, number, number];
-export default class Circle implements Geometry, CircleLiteral {
+export interface CircleCollidable {
+    overlapsCircle(circle: Circle): boolean;
+    intersectCircle(circle: Circle): Vector2[];
+}
+export default class Circle implements CircleLiteral, EdgeCollidable, CircleCollidable, RectangleCollidable, PolygonCollidable {
     x: number;
     y: number;
     radius: number;

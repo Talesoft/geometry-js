@@ -1,43 +1,40 @@
-
-import Vector2 from "./Vector2.js";
+import Vector2 from './Vector2';
 
 export type EdgeTuple = [number, number, number, number];
 
-export default class Edge
-{
-    from: Vector2;
-    to: Vector2;
+export interface EdgeCollidable {
+    overlapsEdge(edge: Edge): boolean;
+    intersectEdge(edge: Edge): Vector2[];
+}
 
-    constructor(from: Vector2, to: Vector2)
-    {
+export default class Edge {
+    public from: Vector2;
+    public to: Vector2;
+
+    constructor(from: Vector2, to: Vector2) {
         this.from = from;
         this.to = to;
     }
 
-    get length(): number
-    {
+    get length(): number {
         return this.from.getDistanceTo(this.to);
     }
 
-    get center(): Vector2
-    {
-        return this.from.copy().add(this.to).divide({x: 2, y: 2});
+    get center(): Vector2 {
+        return this.from.copy().add(this.to).divide({ x: 2, y: 2 });
     }
 
-    get normal(): Vector2
-    {
+    get normal(): Vector2 {
         return this.to.copy().subtract(this.from).perp().normalize();
     }
 
-    intersectEdge(edge: Edge, ray: boolean = false): Vector2|null
-    {
-        const dx1 = this.to.x - this.from.x,
-            dy1 = this.to.y - this.from.y,
-            dx2 = this.from.x - edge.from.x,
-            dy2 = this.from.y - edge.from.y,
-            dx3 = edge.to.x - edge.from.x,
-            dy3 = edge.to.y - edge.from.y;
-
+    public intersectEdge(edge: Edge, ray: boolean = false): Vector2|null {
+        const dx1 = this.to.x - this.from.x;
+        const dy1 = this.to.y - this.from.y;
+        const dx2 = this.from.x - edge.from.x;
+        const dy2 = this.from.y - edge.from.y;
+        const dx3 = edge.to.x - edge.from.x;
+        const dy3 = edge.to.y - edge.from.y;
         if (dy1 / dx1 === dy3 / dx3) {
             return null;
         }
@@ -53,14 +50,12 @@ export default class Edge
         return null;
     }
 
-    toTuple(): EdgeTuple
-    {
+    public toTuple(): EdgeTuple {
         return this.from.toTuple().concat(this.to.toTuple()) as EdgeTuple;
     }
 
-    static fromTuple(tuple: EdgeTuple): Edge
-    {
-        let [ax, ay, bx, by] = tuple;
+    public static fromTuple(tuple: EdgeTuple): Edge {
+        const [ax, ay, bx, by] = tuple;
         return new Edge(new Vector2(ax, ay), new Vector2(bx, by));
     }
 }

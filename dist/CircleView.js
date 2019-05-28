@@ -1,5 +1,10 @@
-import Circle from "./Circle.js";
-export default class CircleView extends Circle {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Circle_1 = __importDefault(require("./Circle"));
+class CircleView extends Circle_1.default {
     constructor(data, offset = 0) {
         super();
         this.data = data;
@@ -24,4 +29,4 @@ export default class CircleView extends Circle {
         this.data[this.offset + 2] = value;
     }
 }
-//# sourceMappingURL=CircleView.js.map
+exports.default = CircleView;

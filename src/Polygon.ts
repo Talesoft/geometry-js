@@ -1,210 +1,177 @@
+import Circle, { CircleCollidable } from './Circle';
+import Edge, { EdgeCollidable } from './Edge';
+import Rectangle, { RectangleCollidable } from './Rectangle';
+import Vector2 from './Vector2';
 
-import Vector2 from "./Vector2.js";
-import Rectangle from "./Rectangle.js";
-import Edge from "./Edge.js";
+export type PolygonTuple = Array<[number, number]>;
 
-export type PolygonTuple = [number, number][];
+const { min, max } = Math;
 
-const centerSymbol: unique symbol = Symbol('center');
-const boundsSymbol: unique symbol = Symbol('bounds');
-const edgesSymbol: unique symbol = Symbol('edges');
-const edgeNormalsSymbol: unique symbol = Symbol('edgeNormals');
-const edgeCentersSymbol: unique symbol = Symbol('edgeCenters');
-
-const {min, max} = Math;
-
-function createInvalidateHandler<T extends Vector2[]|Vector2>(poly: Polygon, deep: boolean = true): ProxyHandler<T>
-{
-    return {
-        set: (target, p, value) =>
-        {
-            if (deep && value instanceof Vector2) {
-                value = new Proxy(value, createInvalidateHandler(poly, false));
-            }
-            target[p] = value;
-            poly[centerSymbol]
-                = poly[boundsSymbol]
-                = poly[edgesSymbol]
-                = poly[edgeNormalsSymbol]
-                = poly[edgeCentersSymbol]
-                = null;
-            return true;
-        }
-    };
+export interface PolygonCollidable {
+    overlapsPolygon(poly: Polygon): boolean;
+    intersectPolygon(poly: Polygon): Vector2[];
 }
 
-export default class Polygon
-{
-    readonly vertices: Vector2[] = new Proxy([], createInvalidateHandler(this));
+export default class Polygon implements EdgeCollidable, PolygonCollidable, RectangleCollidable, CircleCollidable {
+    public readonly vertices: Vector2[] = [];
 
-    constructor(points: Vector2[] = [])
-    {
-        for (let i = 0, len = points.length; i < len; i++) {
-            this.vertices.push(points[i]);
-        }
-        this[centerSymbol] = null;
-        this[boundsSymbol] = null;
-        this[edgesSymbol] = null;
-        this[edgeNormalsSymbol] = null;
-        this[edgeCentersSymbol] = null;
+    constructor(vertices: Vector2[] = []) {
+        this.vertices = vertices;
     }
 
-    get center(): Readonly<Vector2>
-    {
-        if (this[centerSymbol] !== null) {
-            return this[centerSymbol];
-        }
-        let len = this.vertices.length;
-        return this[centerSymbol] = this.vertices
-            .reduce((carry: Vector2, vec2: Vector2) => carry.add(vec2), new Vector2)
-            .divide({x: len, y: len});
+    get center(): Vector2 {
+        const len = this.vertices.length;
+        return this.vertices
+            .reduce((carry: Vector2, vec2: Vector2) => carry.add(vec2), new Vector2())
+            .divide({ x: len, y: len });
     }
 
-    get bounds(): Readonly<Rectangle>
-    {
-        if (this[boundsSymbol] !== null) {
-            return this[boundsSymbol];
-        }
-        let len = this.vertices.length;
+    get bounds(): Rectangle {
+        const len = this.vertices.length;
         if (len === 0) {
-            return this[boundsSymbol] = new Rectangle;
+            return new Rectangle();
         }
-        let minX, minY, maxX, maxY;
-        for (let i = 0; i < len; i++) {
-            let vec2 = this.vertices[i];
-            minX = typeof minX === 'undefined' ? vec2.x : min(minX, vec2.x);
-            minY = typeof minY === 'undefined' ? vec2.y : min(minY, vec2.y);
-            maxX = typeof maxX === 'undefined' ? vec2.x : max(maxX, vec2.x);
-            maxY = typeof maxY === 'undefined' ? vec2.y : max(maxY, vec2.y);
+        let minX = this.vertices[0].x;
+        let minY = this.vertices[0].y;
+        let maxX = minX;
+        let maxY = minY;
+        // Start at 1 as 0 is already covered above (minX, minY)
+        for (let i = 1; i < len; i += 1) {
+            const vec2 = this.vertices[i];
+            minX = min(minX, vec2.x);
+            minY = min(minY, vec2.y);
+            maxX = max(maxX, vec2.x);
+            maxY = max(maxY, vec2.y);
         }
-        return this[boundsSymbol] = new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
-    get edges(): Readonly<Readonly<Edge>[]>
-    {
-        if (this[edgesSymbol] !== null) {
-            return this[edgesSymbol];
-        }
-        let vertices = this.vertices;
-        let len = vertices.length;
+    get edges(): Edge[] {
+        const vertices = this.vertices;
+        const len = vertices.length;
         if (len < 2) {
             return [];
         }
-        let edges = [];
+        const edges = [];
         let last = vertices[len - 1];
-        for (let i = 0; i < len; i++) {
-            let vec2 = vertices[i];
+        for (let i = 0; i < len; i += 1) {
+            const vec2 = vertices[i];
             edges.push(new Edge(last, vec2));
             last = vec2;
         }
-        return this[edgesSymbol] = edges;
+        return edges;
     }
 
-    get edgeNormals(): Readonly<Readonly<Vector2>[]>
-    {
-        if (this[edgeNormalsSymbol] !== null) {
-            return this[edgeNormalsSymbol];
-        }
-        return this[edgeNormalsSymbol] = this.edges.map(edge => edge.normal);
+    get edgeNormals(): Vector2[] {
+        return this.edges.map(edge => edge.normal);
     }
 
-    get edgeCenters(): Readonly<Readonly<Vector2>[]>
-    {
-        if (this[edgeCentersSymbol] !== null) {
-            return this[edgeCentersSymbol];
-        }
-        return this[edgeCentersSymbol] = this.edges.map(edge => edge.center);
+    get edgeCenters(): Vector2[] {
+        return this.edges.map(edge => edge.center);
     }
 
-    get x(): number
-    {
+    get x(): number {
         return this.bounds.x;
     }
 
-    set x(value: number)
-    {
-        let diff = value - this.x;
-        for (let i = 0, len = this.vertices.length; i < len; i++) {
+    set x(value: number) {
+        const diff = value - this.x;
+        for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].x += diff;
         }
     }
 
-    get y(): number
-    {
+    get y(): number {
         return this.bounds.y;
     }
 
-    set y(value: number)
-    {
-        let diff = value - this.y;
-        for (let i = 0, len = this.vertices.length; i < len; i++) {
+    set y(value: number) {
+        const diff = value - this.y;
+        for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].y += diff;
         }
     }
 
-    get width(): number
-    {
+    get width(): number {
         return this.bounds.width;
     }
 
-    set width(value: number)
-    {
-        let ratio = value / this.width,
-            x = this.x;
-        for (let i = 0, len = this.vertices.length; i < len; i++) {
+    set width(value: number) {
+        const ratio = value / this.width;
+        const x = this.x;
+        for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].x = x + (this.vertices[i].x - x) * ratio;
         }
     }
 
-    get height(): number
-    {
+    get height(): number {
         return this.bounds.height;
     }
 
-    set height(value: number)
-    {
-        let ratio = value / this.height,
-            y = this.y;
-        for (let i = 0, len = this.vertices.length; i < len; i++) {
+    set height(value: number) {
+        const ratio = value / this.height;
+        const y = this.y;
+        for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].y = y + (this.vertices[i].y - y) * ratio;
         }
     }
 
-    contains(vec2: Vector2): boolean
-    {
+    public contains(vec2: Vector2): boolean {
         const bounds = this.bounds;
         if (!bounds.contains(vec2)) {
             return false;
         }
 
-        const ray = new Edge(vec2, bounds.leftTop.subtract({x: 1, y: 1}));
+        const ray = new Edge(vec2, bounds.leftTop.subtract({ x: 1, y: 1 }));
         let intersections = 0;
         const edges = this.edges;
-        for (let i = 0, len = edges.length; i < len; i++) {
+        for (let i = 0, len = edges.length; i < len; i += 1) {
             const edge = edges[i];
             if (ray.intersectEdge(edge, true) !== null) {
-                intersections++;
+                intersections += 1;
             }
         }
         return intersections % 2 !== 0;
     }
 
-    //TODO: overlapsEdge(edge: Edge): boolean
-    //TODO: intersectEdge(edge: Edge): Vector2
-    //TODO: overlapsRectangle(rect: Rectangle): boolean
-    //TODO: intersectRectnalge(rect: Rectangle): Vector2
-    //TODO: overlapsCircle(circle: Circle): boolean
-    //TODO: intersectCircle(circle: Circle): Vector2
+    // @ts-ignore
+    public overlapsEdge(edge: Edge): boolean {
+        throw new Error('Not implemented');
+    }
 
-    overlapsPolygon(poly: Polygon): boolean
-    {
+    // @ts-ignore
+    public intersectEdge(edge: Edge): Vector2[] {
+        throw new Error('Not implemented');
+    }
+
+    // @ts-ignore
+    public overlapsRectangle(rect: Rectangle): boolean {
+        throw new Error('Not implemented');
+    }
+
+    // @ts-ignore
+    public intersectRectangle(rect: Rectangle): Vector2[] {
+        throw new Error('Not implemented');
+    }
+
+    // @ts-ignore
+    public overlapsCircle(circle: Circle): boolean {
+        throw new Error('Not implemented');
+    }
+
+    // @ts-ignore
+    public intersectCircle(circle: Circle): Vector2[] {
+        throw new Error('Not implemented');
+    }
+
+    public overlapsPolygon(poly: Polygon): boolean {
         const edges = this.edges;
         const len = edges.length;
         const polyEdges = poly.edges;
         const polyEdgesLen = polyEdges.length;
-        for (let i = 0; i < len; i++) {
+        for (let i = 0; i < len; i += 1) {
             const edge = edges[i];
-            for (let j = 0; j < polyEdgesLen; j++) {
+            for (let j = 0; j < polyEdgesLen; j += 1) {
                 if (edge.intersectEdge(polyEdges[j])) {
                     return true;
                 }
@@ -213,17 +180,17 @@ export default class Polygon
         return false;
     }
 
-    intersectPolygon(poly: Polygon): Vector2[]
-    {
-        let intersections: Vector2[] = [];
-        let edges = this.edges;
-        let polyEdges = poly.edges;
-        let polyEdgesLen = polyEdges.length;
+    public intersectPolygon(poly: Polygon): Vector2[] {
+        const intersections: Vector2[] = [];
+        const edges = this.edges;
+        const polyEdges = poly.edges;
+        const polyEdgesLen = polyEdges.length;
         let intersection;
-        for (let i = 0, len = edges.length; i < len; i++) {
-            let edge = edges[i];
-            for (let j = 0; j < polyEdgesLen; j++) {
-                if ((intersection = edge.intersectEdge(polyEdges[j])) !== null) {
+        for (let i = 0, len = edges.length; i < len; i += 1) {
+            const edge = edges[i];
+            for (let j = 0; j < polyEdgesLen; j += 1) {
+                intersection = edge.intersectEdge(polyEdges[j]);
+                if (intersection !== null) {
                     intersections.push(intersection);
                 }
             }
@@ -231,18 +198,19 @@ export default class Polygon
         return intersections;
     }
 
-    toTuple(): PolygonTuple
-    {
+    public copy(): Polygon {
+        return new Polygon(this.vertices.map(v => v.copy()));
+    }
+
+    public toTuple(): PolygonTuple {
         return this.vertices.map(vec2 => vec2.toTuple());
     }
 
-    toString(): string
-    {
+    public toString(): string {
         return `poly(${this.vertices.map(vec2 => vec2.toString()).join(', ')}`;
     }
 
-    static fromTuple(tuple: PolygonTuple): Polygon
-    {
+    public static fromTuple(tuple: PolygonTuple): Polygon {
         return new Polygon(tuple.map(([x, y]) => new Vector2(x, y)));
     }
 }
