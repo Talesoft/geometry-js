@@ -1,10 +1,10 @@
 {
-    "name": "@talesoft/geometry-js",
+    "name": "@talesoft/geometry",
     "description": "A geometry library",
     "keywords": [
         "geometry"
     ],
-    "version": "0.2.1",
+    "version": "0.1.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "homepage": "https://github.com/Talesoft/geometry-js",
