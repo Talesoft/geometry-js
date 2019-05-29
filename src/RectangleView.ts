@@ -1,4 +1,4 @@
-import Rectangle, {RectangleTuple} from './Rectangle';
+import Rectangle, { RectangleTuple } from './Rectangle';
 
 export default class RectangleView extends Rectangle {
     public static readonly LENGTH = 4;
