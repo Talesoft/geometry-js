@@ -9,6 +9,7 @@ node_js:
     - 10
     - 11
     - 12
+    - 13
 before_script:
     - export VERSION_COMPARISON=$(dpkg --compare-versions $TRAVIS_NODE_VERSION eq 11)
     - >-

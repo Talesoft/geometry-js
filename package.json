@@ -28,18 +28,18 @@
         "build": "tsc",
         "test": "jest",
         "test:coverage": "jest --coverage",
-        "lint": "tslint 'src/**/*.ts'",
-        "lint:fix": "tslint 'src/**/*.ts' --fix"
+        "lint": "tslint --project tsconfig.json 'src/**/*.ts'",
+        "lint:fix": "tslint --project tsconfig.json 'src/**/*.ts' --fix"
     },
     "dependencies": {},
     "devDependencies": {
-        "@types/jest": "^24.0.11",
+        "@types/jest": "^24.0.18",
         "@types/jest-each": "^0.3.4",
-        "jest": "^24.5.0",
-        "jest-each": "^24.8.0",
-        "ts-jest": "^24.0.2",
-        "tslint": "^5.16.0",
+        "jest": "^24.9.0",
+        "jest-each": "^24.9.0",
+        "ts-jest": "^24.1.0",
+        "tslint": "^5.20.0",
         "tslint-config-airbnb": "^5.11.1",
-        "typescript": "^3.5.1"
+        "typescript": "^3.6.3"
     }
 }

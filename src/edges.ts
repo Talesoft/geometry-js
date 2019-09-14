@@ -1,13 +1,18 @@
-import Vector2 from './Vector2';
+import { Vector2, Vector2Literal } from './vectors';
 
-export type EdgeTuple = [number, number, number, number];
+export type EdgeTuple = readonly [number, number, number, number];
+
+export interface EdgeLiteral {
+    from: Vector2Literal;
+    to: Vector2Literal;
+}
 
 export interface EdgeCollidable {
     overlapsEdge(edge: Edge): boolean;
     intersectEdge(edge: Edge): Vector2[];
 }
 
-export default class Edge {
+export class Edge implements EdgeLiteral {
     public from: Vector2;
     public to: Vector2;
 
@@ -16,19 +21,19 @@ export default class Edge {
         this.to = to;
     }
 
-    get length(): number {
+    get length() {
         return this.from.getDistanceTo(this.to);
     }
 
-    get center(): Vector2 {
+    get center() {
         return this.from.copy().add(this.to).divide({ x: 2, y: 2 });
     }
 
-    get normal(): Vector2 {
+    get normal() {
         return this.to.copy().subtract(this.from).perp().normalize();
     }
 
-    public intersectEdge(edge: Edge, ray: boolean = false): Vector2|null {
+    public intersectEdge(edge: Edge, ray: boolean = false) {
         const dx1 = this.to.x - this.from.x;
         const dy1 = this.to.y - this.from.y;
         const dx2 = this.from.x - edge.from.x;
@@ -50,12 +55,20 @@ export default class Edge {
         return null;
     }
 
-    public toTuple(): EdgeTuple {
-        return this.from.toTuple().concat(this.to.toTuple()) as EdgeTuple;
+    public toTuple() {
+        return [...this.from.toTuple(), ...this.to.toTuple()] as any as EdgeTuple;
     }
 
-    public static fromTuple(tuple: EdgeTuple): Edge {
+    public toLiteral() {
+        return { from: this.from.toLiteral(), to: this.to.toLiteral() } as const;
+    }
+
+    public static fromTuple(tuple: EdgeTuple) {
         const [ax, ay, bx, by] = tuple;
         return new Edge(new Vector2(ax, ay), new Vector2(bx, by));
+    }
+
+    public static fromLiteral(literal: Readonly<EdgeLiteral>) {
+        return new Edge(Vector2.fromLiteral(literal.from), Vector2.fromLiteral(literal.to));
     }
 }

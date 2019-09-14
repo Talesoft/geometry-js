@@ -1,14 +1,14 @@
 import { clamp } from './common';
-import Edge, { EdgeCollidable } from './Edge';
-import Polygon, { PolygonCollidable } from './Polygon';
-import Rectangle, { RectangleCollidable } from './Rectangle';
-import Vector2, { Vector2Literal } from './Vector2';
+import { Edge, EdgeCollidable } from './edges';
+import { Polygon, PolygonCollidable } from './polygons';
+import { Rectangle, RectangleCollidable } from './rectangles';
+import { Vector2, Vector2Literal } from './vectors';
 
 const { PI, sqrt } = Math;
 
 export interface CircleLiteral {
-    x: number;
-    y: number;
+    cx: number;
+    cy: number;
     radius: number;
 }
 
@@ -19,23 +19,23 @@ export interface CircleCollidable {
     intersectCircle(circle: Circle): Vector2[];
 }
 
-export default class Circle implements
+export class Circle implements
     CircleLiteral,
     EdgeCollidable,
     CircleCollidable,
     RectangleCollidable,
     PolygonCollidable {
-    public x: number = 0;
-    public y: number = 0;
+    public cx: number = 0;
+    public cy: number = 0;
     public radius: number = 0;
 
-    constructor(x?: number, y?: number, radius?: number) {
-        if (typeof x !== 'undefined') {
-            this.x = x;
+    constructor(cx?: number, cy?: number, radius?: number) {
+        if (typeof cx !== 'undefined') {
+            this.cx = cx;
         }
 
-        if (typeof y !== 'undefined') {
-            this.y = y;
+        if (typeof cy !== 'undefined') {
+            this.cy = cy;
         }
 
         if (typeof radius !== 'undefined') {
@@ -48,21 +48,21 @@ export default class Circle implements
     }
 
     get position(): Vector2 {
-        return new Vector2(this.x, this.y);
+        return new Vector2(this.cx, this.cy);
     }
 
     set position(vec2: Vector2) {
-        this.x = vec2.x;
-        this.y = vec2.y;
+        this.cx = vec2.x;
+        this.cy = vec2.y;
     }
 
     public set(rect: Partial<CircleLiteral>): Circle {
-        if (typeof rect.x !== 'undefined') {
-            this.x = rect.x;
+        if (typeof rect.cx !== 'undefined') {
+            this.cx = rect.cx;
         }
 
-        if (typeof rect.y !== 'undefined') {
-            this.y = rect.y;
+        if (typeof rect.cy !== 'undefined') {
+            this.cy = rect.cy;
         }
 
         if (typeof rect.radius !== 'undefined') {
@@ -72,12 +72,12 @@ export default class Circle implements
     }
 
     public add(rect: Partial<CircleLiteral>): Circle {
-        if (typeof rect.x !== 'undefined') {
-            this.x += rect.x;
+        if (typeof rect.cx !== 'undefined') {
+            this.cx += rect.cx;
         }
 
-        if (typeof rect.y !== 'undefined') {
-            this.y += rect.y;
+        if (typeof rect.cy !== 'undefined') {
+            this.cy += rect.cy;
         }
 
         if (typeof rect.radius !== 'undefined') {
@@ -87,12 +87,12 @@ export default class Circle implements
     }
 
     public subtract(rect: Partial<CircleLiteral>): Circle {
-        if (typeof rect.x !== 'undefined') {
-            this.x -= rect.x;
+        if (typeof rect.cx !== 'undefined') {
+            this.cx -= rect.cx;
         }
 
-        if (typeof rect.y !== 'undefined') {
-            this.y -= rect.y;
+        if (typeof rect.cy !== 'undefined') {
+            this.cy -= rect.cy;
         }
 
         if (typeof rect.radius !== 'undefined') {
@@ -102,12 +102,12 @@ export default class Circle implements
     }
 
     public multiply(rect: Partial<CircleLiteral>): Circle {
-        if (typeof rect.x !== 'undefined') {
-            this.x *= rect.x;
+        if (typeof rect.cx !== 'undefined') {
+            this.cx *= rect.cx;
         }
 
-        if (typeof rect.y !== 'undefined') {
-            this.y *= rect.y;
+        if (typeof rect.cy !== 'undefined') {
+            this.cy *= rect.cy;
         }
 
         if (typeof rect.radius !== 'undefined') {
@@ -117,12 +117,12 @@ export default class Circle implements
     }
 
     public divide(rect: Partial<CircleLiteral>): Circle {
-        if (typeof rect.x !== 'undefined') {
-            this.x /= rect.x;
+        if (typeof rect.cx !== 'undefined') {
+            this.cx /= rect.cx;
         }
 
-        if (typeof rect.y !== 'undefined') {
-            this.y /= rect.y;
+        if (typeof rect.cy !== 'undefined') {
+            this.cy /= rect.cy;
         }
 
         if (typeof rect.radius !== 'undefined') {
@@ -132,11 +132,13 @@ export default class Circle implements
     }
 
     public copy(): Circle {
-        return new Circle(this.x, this.y, this.radius);
+        return new Circle(this.cx, this.cy, this.radius);
     }
 
     public contains(vec2: Vector2Literal): boolean {
-        return sqrt((vec2.x - this.x) * (vec2.x - this.x) + (vec2.y - this.y) * (vec2.y - this.y)) < this.radius;
+        return sqrt(
+            (vec2.x - this.cx) * (vec2.x - this.cx) + (vec2.y - this.cy) * (vec2.y - this.cy),
+        ) < this.radius;
     }
 
     // @ts-ignore
@@ -150,7 +152,7 @@ export default class Circle implements
     }
 
     public overlapsRectangle(rect: Rectangle): boolean {
-        const v = new Vector2(clamp(rect.left, this.x, rect.right), clamp(rect.top, this.y, rect.bottom));
+        const v = new Vector2(clamp(rect.left, this.cx, rect.right), clamp(rect.top, this.cy, rect.bottom));
         const direction = this.position.subtract(v);
         const mag = direction.magnitude;
         return ((mag > 0) && (mag < this.radius * this.radius));
@@ -162,8 +164,8 @@ export default class Circle implements
     }
 
     public overlapsCircle(circle: Circle): boolean {
-        const distanceX = this.x - circle.x;
-        const distanceY = this.y - circle.y;
+        const distanceX = this.cx - circle.cx;
+        const distanceY = this.cy - circle.cy;
         const radiusSum = this.radius + circle.radius;
         return distanceX * distanceX + distanceY * distanceY <= radiusSum * radiusSum;
     }
@@ -184,14 +186,53 @@ export default class Circle implements
     }
 
     public toTuple(): CircleTuple {
-        return [this.x, this.y, this.radius];
+        return [this.cx, this.cy, this.radius];
     }
 
     public toString(): string {
-        return `circle(${this.x.toFixed(2)}, ${this.y.toFixed(2)}, ${this.radius.toFixed(2)})`;
+        return `circle(${this.cx.toFixed(2)}, ${this.cy.toFixed(2)}, ${this.radius.toFixed(2)})`;
     }
 
     public static fromTuple(tuple: CircleTuple): Circle {
         return new Circle(...tuple);
+    }
+
+    public static fromLiteral(literal: CircleLiteral) {
+        return new Circle(literal.cx, literal.cy, literal.radius);
+    }
+}
+
+export class CircleView extends Circle {
+    public readonly data: number[];
+    public readonly offset: number;
+
+    constructor(data: number[], offset: number = 0) {
+        super();
+        this.data = data;
+        this.offset = offset;
+    }
+
+    get x(): number {
+        return this.data[this.offset];
+    }
+
+    set x(value: number) {
+        this.data[this.offset] = value;
+    }
+
+    get y(): number {
+        return this.data[this.offset + 1];
+    }
+
+    set y(value: number) {
+        this.data[this.offset + 1] = value;
+    }
+
+    get radius(): number {
+        return this.data[this.offset + 2];
+    }
+
+    set radius(value: number) {
+        this.data[this.offset + 2] = value;
     }
 }
