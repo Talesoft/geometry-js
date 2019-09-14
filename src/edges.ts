@@ -55,6 +55,10 @@ export class Edge implements EdgeLiteral {
         return null;
     }
 
+    public copy() {
+        return Edge.fromLiteral(this);
+    }
+
     public toTuple() {
         return [...this.from.toTuple(), ...this.to.toTuple()] as any as EdgeTuple;
     }

@@ -1,238 +1,172 @@
-import { clamp } from './common';
-import { Edge, EdgeCollidable } from './edges';
-import { Polygon, PolygonCollidable } from './polygons';
-import { Rectangle, RectangleCollidable } from './rectangles';
-import { Vector2, Vector2Literal } from './vectors';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = require("./common");
+const vectors_1 = require("./vectors");
 const { PI, sqrt } = Math;
-
-export interface CircleLiteral {
-    cx: number;
-    cy: number;
-    radius: number;
-}
-
-export type CircleTuple = readonly [number, number, number];
-
-export interface CircleCollidable {
-    overlapsCircle(circle: Circle): boolean;
-    intersectCircle(circle: Circle): Vector2[];
-}
-
-export class Circle implements
-    CircleLiteral,
-    EdgeCollidable,
-    CircleCollidable,
-    RectangleCollidable,
-    PolygonCollidable {
-    public cx: number = 0;
-    public cy: number = 0;
-    public radius: number = 0;
-
-    constructor(cx?: number, cy?: number, radius?: number) {
+class Circle {
+    constructor(cx, cy, radius) {
+        this.cx = 0;
+        this.cy = 0;
+        this.radius = 0;
         if (typeof cx !== 'undefined') {
             this.cx = cx;
         }
-
         if (typeof cy !== 'undefined') {
             this.cy = cy;
         }
-
         if (typeof radius !== 'undefined') {
             this.radius = radius;
         }
     }
-
     get area() {
         return this.radius * this.radius * PI;
     }
-
     get center() {
-        return new Vector2(this.cx, this.cy);
+        return new vectors_1.Vector2(this.cx, this.cy);
     }
-
-    set center(vec2: Vector2) {
+    set center(vec2) {
         this.cx = vec2.x;
         this.cy = vec2.y;
     }
-
-    public set(rect: Partial<Readonly<CircleLiteral>>) {
+    set(rect) {
         if (typeof rect.cx !== 'undefined') {
             this.cx = rect.cx;
         }
-
         if (typeof rect.cy !== 'undefined') {
             this.cy = rect.cy;
         }
-
         if (typeof rect.radius !== 'undefined') {
             this.radius = rect.radius;
         }
         return this;
     }
-
-    public add(rect: Partial<Readonly<CircleLiteral>>) {
+    add(rect) {
         if (typeof rect.cx !== 'undefined') {
             this.cx += rect.cx;
         }
-
         if (typeof rect.cy !== 'undefined') {
             this.cy += rect.cy;
         }
-
         if (typeof rect.radius !== 'undefined') {
             this.radius += rect.radius;
         }
         return this;
     }
-
-    public subtract(rect: Partial<Readonly<CircleLiteral>>) {
+    subtract(rect) {
         if (typeof rect.cx !== 'undefined') {
             this.cx -= rect.cx;
         }
-
         if (typeof rect.cy !== 'undefined') {
             this.cy -= rect.cy;
         }
-
         if (typeof rect.radius !== 'undefined') {
             this.radius -= rect.radius;
         }
         return this;
     }
-
-    public multiply(rect: Partial<Readonly<CircleLiteral>>) {
+    multiply(rect) {
         if (typeof rect.cx !== 'undefined') {
             this.cx *= rect.cx;
         }
-
         if (typeof rect.cy !== 'undefined') {
             this.cy *= rect.cy;
         }
-
         if (typeof rect.radius !== 'undefined') {
             this.radius *= rect.radius;
         }
         return this;
     }
-
-    public divide(rect: Partial<Readonly<CircleLiteral>>) {
+    divide(rect) {
         if (typeof rect.cx !== 'undefined') {
             this.cx /= rect.cx;
         }
-
         if (typeof rect.cy !== 'undefined') {
             this.cy /= rect.cy;
         }
-
         if (typeof rect.radius !== 'undefined') {
             this.radius /= rect.radius;
         }
         return this;
     }
-
-    public copy() {
+    copy() {
         return new Circle(this.cx, this.cy, this.radius);
     }
-
-    public contains(vec2: Readonly<Vector2Literal>) {
-        return sqrt(
-            (vec2.x - this.cx) * (vec2.x - this.cx) + (vec2.y - this.cy) * (vec2.y - this.cy),
-        ) < this.radius;
+    contains(vec2) {
+        return sqrt((vec2.x - this.cx) * (vec2.x - this.cx) + (vec2.y - this.cy) * (vec2.y - this.cy)) < this.radius;
     }
-
     // @ts-ignore
-    public overlapsEdge(edge: Edge) {
+    overlapsEdge(edge) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public intersectEdge(edge: Edge) {
+    intersectEdge(edge) {
         throw new Error('Not implemented');
     }
-
-    public overlapsRectangle(rect: Rectangle) {
-        const v = new Vector2(clamp(rect.left, this.cx, rect.right), clamp(rect.top, this.cy, rect.bottom));
+    overlapsRectangle(rect) {
+        const v = new vectors_1.Vector2(common_1.clamp(rect.left, this.cx, rect.right), common_1.clamp(rect.top, this.cy, rect.bottom));
         const direction = this.center.subtract(v);
         const mag = direction.magnitude;
         return ((mag > 0) && (mag < this.radius * this.radius));
     }
-
     // @ts-ignore
-    public intersectRectangle(rect: Rectangle) {
+    intersectRectangle(rect) {
         throw new Error('Not implemented');
     }
-
-    public overlapsCircle(circle: Circle) {
+    overlapsCircle(circle) {
         const distanceX = this.cx - circle.cx;
         const distanceY = this.cy - circle.cy;
         const radiusSum = this.radius + circle.radius;
         return distanceX * distanceX + distanceY * distanceY <= radiusSum * radiusSum;
     }
-
     // @ts-ignore
-    public intersectCircle(circle: Circle) {
+    intersectCircle(circle) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public overlapsPolygon(poly: Polygon) {
+    overlapsPolygon(poly) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public intersectPolygon(poly: Polygon) {
+    intersectPolygon(poly) {
         throw new Error('Not implemented');
     }
-
-    public toTuple() {
-        return [this.cx, this.cy, this.radius] as const;
+    toTuple() {
+        return [this.cx, this.cy, this.radius];
     }
-
-    public toString() {
+    toString() {
         return `circle(${this.cx.toFixed(2)}, ${this.cy.toFixed(2)}, ${this.radius.toFixed(2)})`;
     }
-
-    public static fromTuple(tuple: CircleTuple) {
+    static fromTuple(tuple) {
         return new Circle(...tuple);
     }
-
-    public static fromLiteral(literal: Readonly<CircleLiteral>) {
+    static fromLiteral(literal) {
         return new Circle(literal.cx, literal.cy, literal.radius);
     }
 }
-
-export class CircleView extends Circle {
-    public readonly data: number[];
-    public readonly offset: number;
-
-    constructor(data: number[], offset: number = 0) {
+exports.Circle = Circle;
+class CircleView extends Circle {
+    constructor(data, offset = 0) {
         super();
         this.data = data;
         this.offset = offset;
     }
-
     get x() {
         return this.data[this.offset];
     }
-
-    set x(value: number) {
+    set x(value) {
         this.data[this.offset] = value;
     }
-
     get y() {
         return this.data[this.offset + 1];
     }
-
-    set y(value: number) {
+    set y(value) {
         this.data[this.offset + 1] = value;
     }
-
     get radius() {
         return this.data[this.offset + 2];
     }
-
-    set radius(value: number) {
+    set radius(value) {
         this.data[this.offset + 2] = value;
     }
 }
+exports.CircleView = CircleView;

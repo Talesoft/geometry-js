@@ -1,36 +1,24 @@
-import { Circle, CircleCollidable } from './circles';
-import { Edge, EdgeCollidable } from './edges';
-import { TransformationMatrix2 } from './matrices';
-import { Rectangle, RectangleCollidable } from './rectangles';
-import { Vector2, Vector2View } from './vectors';
-
-export type PolygonTuple = Array<[number, number]>;
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const edges_1 = require("./edges");
+const rectangles_1 = require("./rectangles");
+const vectors_1 = require("./vectors");
 const { min, max } = Math;
-
-export interface PolygonCollidable {
-    overlapsPolygon(poly: Polygon): boolean;
-    intersectPolygon(poly: Polygon): Vector2[];
-}
-
-export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleCollidable, CircleCollidable {
-    public readonly vertices: readonly Vector2[] = [];
-
-    constructor(vertices: readonly Vector2[] = []) {
+class Polygon {
+    constructor(vertices = []) {
+        this.vertices = [];
         this.vertices = vertices;
     }
-
     get center() {
         const len = this.vertices.length;
         return this.vertices
-            .reduce((carry, vec2) => carry.add(vec2), new Vector2())
+            .reduce((carry, vec2) => carry.add(vec2), new vectors_1.Vector2())
             .divide({ x: len, y: len });
     }
-
     get bounds() {
         const len = this.vertices.length;
         if (len === 0) {
-            return new Rectangle();
+            return new rectangles_1.Rectangle();
         }
         let minX = this.vertices[0].x;
         let minY = this.vertices[0].y;
@@ -44,9 +32,8 @@ export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleColl
             maxX = max(maxX, vec2.x);
             maxY = max(maxY, vec2.y);
         }
-        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        return new rectangles_1.Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
-
     get edges() {
         const vertices = this.vertices;
         const len = vertices.length;
@@ -57,73 +44,61 @@ export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleColl
         let last = vertices[len - 1];
         for (let i = 0; i < len; i += 1) {
             const vec2 = vertices[i];
-            edges.push(new Edge(last, vec2));
+            edges.push(new edges_1.Edge(last, vec2));
             last = vec2;
         }
         return edges;
     }
-
     get edgeNormals() {
         return this.edges.map(edge => edge.normal);
     }
-
     get edgeCenters() {
         return this.edges.map(edge => edge.center);
     }
-
     get x() {
         return this.bounds.x;
     }
-
-    set x(value: number) {
+    set x(value) {
         const diff = value - this.x;
         for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].x += diff;
         }
     }
-
     get y() {
         return this.bounds.y;
     }
-
-    set y(value: number) {
+    set y(value) {
         const diff = value - this.y;
         for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].y += diff;
         }
     }
-
     get width() {
         return this.bounds.width;
     }
-
-    set width(value: number) {
+    set width(value) {
         const ratio = value / this.width;
         const x = this.x;
         for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].x = x + (this.vertices[i].x - x) * ratio;
         }
     }
-
     get height() {
         return this.bounds.height;
     }
-
-    set height(value: number) {
+    set height(value) {
         const ratio = value / this.height;
         const y = this.y;
         for (let i = 0, len = this.vertices.length; i < len; i += 1) {
             this.vertices[i].y = y + (this.vertices[i].y - y) * ratio;
         }
     }
-
-    public contains(vec2: Readonly<Vector2>) {
+    contains(vec2) {
         const bounds = this.bounds;
         if (!bounds.contains(vec2)) {
             return false;
         }
-
-        const ray = new Edge(vec2, bounds.leftTop.subtract({ x: 1, y: 1 }));
+        const ray = new edges_1.Edge(vec2, bounds.leftTop.subtract({ x: 1, y: 1 }));
         let intersections = 0;
         const edges = this.edges;
         for (let i = 0, len = edges.length; i < len; i += 1) {
@@ -134,38 +109,31 @@ export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleColl
         }
         return intersections % 2 !== 0;
     }
-
     // @ts-ignore
-    public overlapsEdge(edge: Edge) {
+    overlapsEdge(edge) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public intersectEdge(edge: Edge) {
+    intersectEdge(edge) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public overlapsRectangle(rect: Rectangle) {
+    overlapsRectangle(rect) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public intersectRectangle(rect: Rectangle) {
+    intersectRectangle(rect) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public overlapsCircle(circle: Circle) {
+    overlapsCircle(circle) {
         throw new Error('Not implemented');
     }
-
     // @ts-ignore
-    public intersectCircle(circle: Circle) {
+    intersectCircle(circle) {
         throw new Error('Not implemented');
     }
-
-    public overlapsPolygon(poly: Polygon) {
+    overlapsPolygon(poly) {
         const edges = this.edges;
         const polyEdges = poly.edges;
         for (let i = 0; i < edges.length; i += 1) {
@@ -178,9 +146,8 @@ export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleColl
         }
         return false;
     }
-
-    public intersectPolygon(poly: Polygon) {
-        const intersections: Vector2[] = [];
+    intersectPolygon(poly) {
+        const intersections = [];
         const edges = this.edges;
         const polyEdges = poly.edges;
         let intersection;
@@ -195,45 +162,37 @@ export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleColl
         }
         return intersections;
     }
-
-    public copy() {
+    copy() {
         return new Polygon(this.vertices.map(v => v.copy()));
     }
-
-    public transform(matrix: TransformationMatrix2) {
+    transform(matrix) {
         for (let i = 0; i < this.vertices.length; i += 1) {
             this.vertices[i].transform(matrix);
         }
     }
-
-    public toTuple() {
+    toTuple() {
         return this.vertices.map(vec2 => vec2.toTuple());
     }
-
-    public toString() {
+    toString() {
         return `poly(${this.vertices.map(vec2 => vec2.toString()).join(', ')}`;
     }
-
-    public static fromTuple(tuple: Readonly<PolygonTuple>): Polygon {
-        return new Polygon(tuple.map(([x, y]) => new Vector2(x, y)));
+    static fromTuple(tuple) {
+        return new Polygon(tuple.map(([x, y]) => new vectors_1.Vector2(x, y)));
     }
 }
-
-export class PolygonView extends Polygon {
-    public data: number[];
-    public offset: number;
-
-    constructor(data: number[], offset: number = 0) {
-        const vertices: Vector2View[] = [];
-        for (let i = 0; i < data.length; i += Vector2View.LENGTH) {
-            vertices.push(new Vector2View(data, offset + i));
+exports.Polygon = Polygon;
+class PolygonView extends Polygon {
+    constructor(data, offset = 0) {
+        const vertices = [];
+        for (let i = 0; i < data.length; i += vectors_1.Vector2View.LENGTH) {
+            vertices.push(new vectors_1.Vector2View(data, offset + i));
         }
         super(vertices);
         this.data = data;
         this.offset = offset;
     }
-
-    public copy(): PolygonView {
+    copy() {
         return new PolygonView(this.data, this.offset);
     }
 }
+exports.PolygonView = PolygonView;

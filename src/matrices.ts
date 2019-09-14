@@ -1,10 +1,27 @@
 /**
- * [ [ a, b, tx ],
- *   [ c, d, ty ] ]
+ * [ [ a, c, tx ],
+ *   [ b, d, ty ],
+ *   [ 0, 0, 1 ] ]
+ *
+ * a = X Scale
+ * c = X Rotation throgh Y
+ * tx = X Translation
+ * b = Y Rotation through X
+ * d = Y Scale
+ * ty = Y Translation
+ *
+ * last row is constant (and will be ignored by the implementation, only tx/ty
+ * will be used in the multiplication as it's tx * 1 anyways)
+ *
+ * Will be projected against 2d points (x, y)
+ *
+ * [ a, c, tx ]     [ x ]     [ a * x + c * y + tx * 1 ]       [ Transformed X ]
+ * [ b, d, ty ]  *  [ y ]  =  [ b * x + d * y + ty * 1 ]   =   [ Transformed Y ]
+ * [ 0, 0, 1  ]     [ 1 ]     [ 0 * x + 0 * y + 1 * 1  ]       [ 1 (Ignored Z) ]
  */
 import { Vector2Literal } from './vectors';
 
-export class TransformationMatrix2d {
+export class TransformationMatrix2 {
     public a: number;
     public b: number;
     public c: number;
@@ -35,7 +52,7 @@ export class TransformationMatrix2d {
         return this;
     }
 
-    public translate(vec2: Partial<Vector2Literal>) {
+    public translate(vec2: Partial<Readonly<Vector2Literal>>) {
         if (typeof vec2.x !== 'undefined') {
             this.tx += vec2.x;
         }
@@ -45,8 +62,8 @@ export class TransformationMatrix2d {
         return this;
     }
 
-    public scale(vec2: Partial<Vector2Literal>) {
-        return this.multiply(new TransformationMatrix2d(
+    public scale(vec2: Partial<Readonly<Vector2Literal>>) {
+        return this.multiply(new TransformationMatrix2(
             typeof vec2.x !== 'undefined' ? vec2.x : 1,
             0,
             0,
@@ -59,11 +76,11 @@ export class TransformationMatrix2d {
     public rotate(radians: number) {
         const cos = Math.cos(radians);
         const sin = Math.sin(radians);
-        return this.multiply(new TransformationMatrix2d(cos, sin, -sin, -cos, 0, 0));
+        return this.multiply(new TransformationMatrix2(cos, sin, -sin, -cos, 0, 0));
     }
 
-    public skew(vec2: Vector2Literal) {
-        return this.multiply(new TransformationMatrix2d(
+    public skew(vec2: Readonly<Vector2Literal>) {
+        return this.multiply(new TransformationMatrix2(
             1,
             Math.tan(vec2.y),
             Math.tan(vec2.x),
@@ -78,7 +95,7 @@ export class TransformationMatrix2d {
         if (det === 0) {
             throw new Error('The matrix is not inversible since it would require a division through zero');
         }
-        return new TransformationMatrix2d(
+        return new TransformationMatrix2(
             this.d / det,
             -this.b / det,
             -this.c / det,
@@ -88,7 +105,7 @@ export class TransformationMatrix2d {
         );
     }
 
-    public multiply(other: TransformationMatrix2d) {
+    public multiply(other: Readonly<TransformationMatrix2>) {
         const { a, b, c, d, tx, ty } = this;
         this.a = a * other.a + c * other.b;
         this.b = b * other.a + d * other.b;
@@ -106,6 +123,6 @@ export class TransformationMatrix2d {
     }
 
     public toString() {
-        return `matrix(${this.a}, ${this.b}, ${this.c}, ${this.d}, ${this.tx}, ${this.ty})`;
+        return `matrix2(${this.a}, ${this.b}, ${this.c}, ${this.d}, ${this.tx}, ${this.ty})`;
     }
 }
