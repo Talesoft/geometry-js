@@ -207,9 +207,6 @@ class Vector2View extends Vector2 {
     set y(value) {
         this.data[this.offset + 1] = value;
     }
-    copy() {
-        return new Vector2View(this.data, this.offset);
-    }
 }
 exports.Vector2View = Vector2View;
-Vector2View.LENGTH = 2;
+Vector2View.SIZE = 2;

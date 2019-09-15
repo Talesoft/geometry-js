@@ -1,4 +1,5 @@
 import { Circle, CircleCollidable } from './circles';
+import { NumericArray } from './common';
 import { Edge, EdgeCollidable } from './edges';
 import { TransformationMatrix2 } from './matrices';
 import { Rectangle, RectangleCollidable } from './rectangles';
@@ -220,20 +221,16 @@ export class Polygon implements EdgeCollidable, PolygonCollidable, RectangleColl
 }
 
 export class PolygonView extends Polygon {
-    public data: number[];
+    public data: NumericArray;
     public offset: number;
 
-    constructor(data: number[], offset: number = 0) {
+    constructor(data: NumericArray, offset: number = 0) {
         const vertices: Vector2View[] = [];
-        for (let i = 0; i < data.length; i += Vector2View.LENGTH) {
+        for (let i = 0; i < data.length; i += Vector2View.SIZE) {
             vertices.push(new Vector2View(data, offset + i));
         }
         super(vertices);
         this.data = data;
         this.offset = offset;
-    }
-
-    public copy(): PolygonView {
-        return new PolygonView(this.data, this.offset);
     }
 }

@@ -10,3 +10,4 @@ __export(require("./matrices"));
 __export(require("./polygons"));
 __export(require("./rectangles"));
 __export(require("./vectors"));
+__export(require("./views"));

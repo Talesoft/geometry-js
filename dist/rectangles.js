@@ -299,9 +299,6 @@ class RectangleView extends Rectangle {
     set height(value) {
         this.data[this.offset + 3] = value;
     }
-    copy() {
-        return new RectangleView(this.data, this.offset);
-    }
 }
 exports.RectangleView = RectangleView;
-RectangleView.LENGTH = 4;
+RectangleView.SIZE = 4;

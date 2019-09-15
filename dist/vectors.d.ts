@@ -1,3 +1,4 @@
+import { NumericArray } from './common';
 import { TransformationMatrix2 } from './matrices';
 export interface Vector2Literal {
     x: number;
@@ -52,11 +53,10 @@ export declare class Vector2 implements Vector2Literal {
     static fromLiteral(literal: Readonly<Vector2Literal>): Vector2;
 }
 export declare class Vector2View extends Vector2 {
-    static readonly LENGTH = 2;
-    readonly data: number[];
+    static readonly SIZE = 2;
+    readonly data: NumericArray;
     readonly offset: number;
-    constructor(data: number[], offset?: number);
+    constructor(data: NumericArray, offset?: number);
     x: number;
     y: number;
-    copy(): Vector2View;
 }

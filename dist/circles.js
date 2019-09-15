@@ -89,7 +89,7 @@ class Circle {
         return this;
     }
     copy() {
-        return new Circle(this.cx, this.cy, this.radius);
+        return Circle.fromLiteral(this);
     }
     contains(vec2) {
         return sqrt((vec2.x - this.cx) * (vec2.x - this.cx) + (vec2.y - this.cy) * (vec2.y - this.cy)) < this.radius;
@@ -133,6 +133,9 @@ class Circle {
     toTuple() {
         return [this.cx, this.cy, this.radius];
     }
+    toLiteral() {
+        return { cx: this.cx, cy: this.cy, radius: this.radius };
+    }
     toString() {
         return `circle(${this.cx.toFixed(2)}, ${this.cy.toFixed(2)}, ${this.radius.toFixed(2)})`;
     }
@@ -170,3 +173,4 @@ class CircleView extends Circle {
     }
 }
 exports.CircleView = CircleView;
+CircleView.SIZE = 3;

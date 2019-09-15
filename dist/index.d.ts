@@ -5,3 +5,4 @@ export * from './matrices';
 export * from './polygons';
 export * from './rectangles';
 export * from './vectors';
+export * from './views';

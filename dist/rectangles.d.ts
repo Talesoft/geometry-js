@@ -1,4 +1,5 @@
 import { Circle, CircleCollidable } from './circles';
+import { NumericArray } from './common';
 import { Edge, EdgeCollidable } from './edges';
 import { Polygon, PolygonCollidable } from './polygons';
 import { Vector2, Vector2Literal } from './vectors';
@@ -68,13 +69,12 @@ export declare class Rectangle implements RectangleLiteral, EdgeCollidable, Rect
     static fromLiteral(literal: Readonly<RectangleLiteral>): Rectangle;
 }
 export declare class RectangleView extends Rectangle {
-    static readonly LENGTH = 4;
-    readonly data: number[];
+    static readonly SIZE = 4;
+    readonly data: NumericArray;
     readonly offset: number;
-    constructor(data: number[], offset?: number);
+    constructor(data: NumericArray, offset?: number);
     x: number;
     y: number;
     width: number;
     height: number;
-    copy(): RectangleView;
 }

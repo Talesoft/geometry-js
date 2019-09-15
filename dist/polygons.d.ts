@@ -1,4 +1,5 @@
 import { Circle, CircleCollidable } from './circles';
+import { NumericArray } from './common';
 import { Edge, EdgeCollidable } from './edges';
 import { TransformationMatrix2 } from './matrices';
 import { Rectangle, RectangleCollidable } from './rectangles';
@@ -36,8 +37,7 @@ export declare class Polygon implements EdgeCollidable, PolygonCollidable, Recta
     static fromTuple(tuple: Readonly<PolygonTuple>): Polygon;
 }
 export declare class PolygonView extends Polygon {
-    data: number[];
+    data: NumericArray;
     offset: number;
-    constructor(data: number[], offset?: number);
-    copy(): PolygonView;
+    constructor(data: NumericArray, offset?: number);
 }

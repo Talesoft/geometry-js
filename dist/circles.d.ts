@@ -1,3 +1,4 @@
+import { NumericArray } from './common';
 import { Edge, EdgeCollidable } from './edges';
 import { Polygon, PolygonCollidable } from './polygons';
 import { Rectangle, RectangleCollidable } from './rectangles';
@@ -35,14 +36,20 @@ export declare class Circle implements CircleLiteral, EdgeCollidable, CircleColl
     overlapsPolygon(poly: Polygon): void;
     intersectPolygon(poly: Polygon): void;
     toTuple(): readonly [number, number, number];
+    toLiteral(): {
+        readonly cx: number;
+        readonly cy: number;
+        readonly radius: number;
+    };
     toString(): string;
     static fromTuple(tuple: CircleTuple): Circle;
     static fromLiteral(literal: Readonly<CircleLiteral>): Circle;
 }
 export declare class CircleView extends Circle {
-    readonly data: number[];
+    static readonly SIZE = 3;
+    readonly data: NumericArray;
     readonly offset: number;
-    constructor(data: number[], offset?: number);
+    constructor(data: NumericArray, offset?: number);
     x: number;
     y: number;
     radius: number;

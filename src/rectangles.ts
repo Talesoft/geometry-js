@@ -1,5 +1,5 @@
 import { Circle, CircleCollidable } from './circles';
-import { clamp } from './common';
+import { clamp, NumericArray } from './common';
 import { Edge, EdgeCollidable } from './edges';
 import { Polygon, PolygonCollidable } from './polygons';
 import { Vector2, Vector2Literal } from './vectors';
@@ -364,11 +364,11 @@ export class Rectangle implements
 }
 
 export class RectangleView extends Rectangle {
-    public static readonly LENGTH = 4;
-    public readonly data: number[];
+    public static readonly SIZE = 4;
+    public readonly data: NumericArray;
     public readonly offset: number;
 
-    constructor(data: number[], offset: number = 0) {
+    constructor(data: NumericArray, offset: number = 0) {
         super();
         this.data = data;
         this.offset = offset;
@@ -404,9 +404,5 @@ export class RectangleView extends Rectangle {
 
     set height(value: number) {
         this.data[this.offset + 3] = value;
-    }
-
-    public copy() {
-        return new RectangleView(this.data, this.offset);
     }
 }

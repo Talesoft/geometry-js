@@ -184,15 +184,12 @@ exports.Polygon = Polygon;
 class PolygonView extends Polygon {
     constructor(data, offset = 0) {
         const vertices = [];
-        for (let i = 0; i < data.length; i += vectors_1.Vector2View.LENGTH) {
+        for (let i = 0; i < data.length; i += vectors_1.Vector2View.SIZE) {
             vertices.push(new vectors_1.Vector2View(data, offset + i));
         }
         super(vertices);
         this.data = data;
         this.offset = offset;
-    }
-    copy() {
-        return new PolygonView(this.data, this.offset);
     }
 }
 exports.PolygonView = PolygonView;

@@ -1,4 +1,4 @@
-import { clamp, clamp01, EPSILON } from './common';
+import { clamp, clamp01, EPSILON, NumericArray } from './common';
 import { TransformationMatrix2 } from './matrices';
 
 const { sqrt, acos, min, max } = Math;
@@ -239,11 +239,11 @@ export class Vector2 implements Vector2Literal {
 }
 
 export class Vector2View extends Vector2 {
-    public static readonly LENGTH = 2;
-    public readonly data: number[];
+    public static readonly SIZE = 2;
+    public readonly data: NumericArray;
     public readonly offset: number;
 
-    constructor(data: number[], offset: number = 0) {
+    constructor(data: NumericArray, offset: number = 0) {
         super();
         this.data = data;
         this.offset = offset;
@@ -263,9 +263,5 @@ export class Vector2View extends Vector2 {
 
     set y(value: number) {
         this.data[this.offset + 1] = value;
-    }
-
-    public copy() {
-        return new Vector2View(this.data, this.offset);
     }
 }

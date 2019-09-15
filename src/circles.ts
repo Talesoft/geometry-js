@@ -1,4 +1,4 @@
-import { clamp } from './common';
+import { clamp, NumericArray } from './common';
 import { Edge, EdgeCollidable } from './edges';
 import { Polygon, PolygonCollidable } from './polygons';
 import { Rectangle, RectangleCollidable } from './rectangles';
@@ -132,7 +132,7 @@ export class Circle implements
     }
 
     public copy() {
-        return new Circle(this.cx, this.cy, this.radius);
+        return Circle.fromLiteral(this);
     }
 
     public contains(vec2: Readonly<Vector2Literal>) {
@@ -189,6 +189,10 @@ export class Circle implements
         return [this.cx, this.cy, this.radius] as const;
     }
 
+    public toLiteral() {
+        return { cx: this.cx, cy: this.cy, radius: this.radius } as const;
+    }
+
     public toString() {
         return `circle(${this.cx.toFixed(2)}, ${this.cy.toFixed(2)}, ${this.radius.toFixed(2)})`;
     }
@@ -203,10 +207,11 @@ export class Circle implements
 }
 
 export class CircleView extends Circle {
-    public readonly data: number[];
+    public static readonly SIZE = 3;
+    public readonly data: NumericArray;
     public readonly offset: number;
 
-    constructor(data: number[], offset: number = 0) {
+    constructor(data: NumericArray, offset: number = 0) {
         super();
         this.data = data;
         this.offset = offset;
